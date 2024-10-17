@@ -37,17 +37,17 @@ class SinglePoint(BaseCalculation):
     struct_path : PathLike | None
         Path of structure to simulate. Required if `struct` is None.
         Default is None.
-    arch : Architectures
+    arch : MaybeSequence[Architectures]
         MLIP architecture to use for single point calculations.
         Default is "mace_mp".
-    device : Devices
+    device : MaybeSequence[Devices]
         Device to run model on. Default is "cpu".
-    model_path : PathLike | None
+    model_path : MaybeSequence[PathLike] | None
         Path to MLIP model. Default is `None`.
     read_kwargs : ASEReadArgs
         Keyword arguments to pass to ase.io.read. By default,
         read_kwargs["index"] is ":".
-    calc_kwargs : dict[str, Any] | None
+    calc_kwargs : MaybeSequence[dict[str, Any]] | None
         Keyword arguments to pass to the selected calculator. Default is {}.
     set_calc : bool | None
         Whether to set (new) calculators for structures. Default is None.
@@ -84,11 +84,11 @@ class SinglePoint(BaseCalculation):
         *,
         struct: MaybeSequence[Atoms] | None = None,
         struct_path: PathLike | None = None,
-        arch: Architectures = "mace_mp",
-        device: Devices = "cpu",
-        model_path: PathLike | None = None,
+        arch: MaybeSequence[Architectures] = "mace_mp",
+        device: MaybeSequence[Devices] = "cpu",
+        model_path: MaybeSequence[PathLike] | None = None,
         read_kwargs: ASEReadArgs | None = None,
-        calc_kwargs: dict[str, Any] | None = None,
+        calc_kwargs: MaybeSequence[dict[str, Any]] | None = None,
         set_calc: bool | None = None,
         attach_logger: bool = False,
         log_kwargs: dict[str, Any] | None = None,
@@ -109,17 +109,17 @@ class SinglePoint(BaseCalculation):
         struct_path : PathLike | None
             Path of structure to simulate. Required if `struct` is None.
             Default is None.
-        arch : Architectures
+        arch : MaybeSequence[Architectures]
             MLIP architecture to use for single point calculations.
             Default is "mace_mp".
-        device : Devices
+        device : MaybeSequence[Devices]
             Device to run MLIP model on. Default is "cpu".
-        model_path : PathLike | None
+        model_path : MaybeSequence[PathLike] | None
             Path to MLIP model. Default is `None`.
         read_kwargs : ASEReadArgs | None
             Keyword arguments to pass to ase.io.read. By default,
             read_kwargs["index"] is ":".
-        calc_kwargs : dict[str, Any] | None
+        calc_kwargs : MaybeSequence[dict[str, Any]] | None
             Keyword arguments to pass to the selected calculator. Default is {}.
         set_calc : bool | None
             Whether to set (new) calculators for structures. Default is None.

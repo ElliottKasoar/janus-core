@@ -22,7 +22,8 @@ from janus_core.helpers.janus_types import (
     Properties,
 )
 from janus_core.helpers.mlip_calculators import choose_calculator
-from janus_core.helpers.utils import none_to_dict
+from janus_core.helpers.multi_calc import MultiCalc
+from janus_core.helpers.utils import none_to_dict, param_to_sequence
 
 
 def results_to_info(
@@ -71,10 +72,10 @@ def results_to_info(
 def attach_calculator(
     struct: MaybeSequence[Atoms],
     *,
-    arch: Architectures = "mace_mp",
-    device: Devices = "cpu",
-    model_path: PathLike | None = None,
-    calc_kwargs: dict[str, Any] | None = None,
+    arch: MaybeSequence[Architectures] = "mace_mp",
+    device: MaybeSequence[Devices] = "cpu",
+    model_path: MaybeSequence[PathLike] | None = None,
+    calc_kwargs: MaybeSequence[dict[str, Any]] | None = None,
 ) -> None:
     """
     Configure calculator and attach to structure(s).
@@ -83,29 +84,56 @@ def attach_calculator(
     ----------
     struct : MaybeSequence[Atoms] | None
         ASE Atoms structure(s) to attach calculators to.
-    arch : Architectures
+    arch : MaybeSequence[Architectures]
         MLIP architecture to use for calculations. Default is "mace_mp".
-    device : Devices
+    device : MaybeSequence[Devices]
         Device to run model on. Default is "cpu".
-    model_path : PathLike | None
+    model_path : MaybeSequence[PathLike] | None
         Path to MLIP model. Default is `None`.
-    calc_kwargs : dict[str, Any] | None
+    calc_kwargs : MaybeSequence[dict[str, Any]] | None
         Keyword arguments to pass to the selected calculator. Default is {}.
     """
     (calc_kwargs,) = none_to_dict(calc_kwargs)
 
-    calculator = choose_calculator(
-        arch=arch,
-        device=device,
-        model_path=model_path,
-        **calc_kwargs,
-    )
+    # Convert parameters to sequence
+    arch = param_to_sequence(arch)
+    device = param_to_sequence(device)
+    model_path = param_to_sequence(model_path)
+    calc_kwargs = param_to_sequence(calc_kwargs)
+
+    calculators = []
+    for i, _arch in enumerate(arch):
+        if i < len(device):
+            _device = device[i]
+        else:
+            _device = "cpu"
+
+        if i < len(model_path):
+            _model_path = model_path[i]
+        else:
+            _model_path = None
+        if i < len(calc_kwargs):
+            _calc_kwargs = calc_kwargs[i]
+        else:
+            _calc_kwargs = {}
+        calculators.append(
+            choose_calculator(
+                arch=_arch,
+                device=_device,
+                model_path=_model_path,
+                **_calc_kwargs,
+            )
+        )
+    if len(calculators) == 1:
+        calc = calculators[0]
+    else:
+        calc = MultiCalc(calculators)
 
     if isinstance(struct, Sequence):
         for image in struct:
-            image.calc = copy(calculator)
+            image.calc = copy(calc)
     else:
-        struct.calc = calculator
+        struct.calc = calc
 
 
 def input_structs(
@@ -114,10 +142,10 @@ def input_structs(
     struct_path: PathLike | None = None,
     read_kwargs: ASEReadArgs | None = None,
     sequence_allowed: bool = True,
-    arch: Architectures = "mace_mp",
-    device: Devices = "cpu",
-    model_path: PathLike | None = None,
-    calc_kwargs: dict[str, Any] | None = None,
+    arch: MaybeSequence[Architectures] = "mace_mp",
+    device: MaybeSequence[Devices] = "cpu",
+    model_path: MaybeSequence[PathLike] | None = None,
+    calc_kwargs: MaybeSequence[dict[str, Any]] | None = None,
     set_calc: bool | None = None,
     logger: logging.Logger | None = None,
 ) -> MaybeSequence[Atoms]:
@@ -135,13 +163,13 @@ def input_structs(
         Keyword arguments to pass to ase.io.read. Default is {}.
     sequence_allowed : bool
         Whether a sequence of Atoms objects is allowed. Default is True.
-    arch : Architectures
+    arch : MaybeSequence[Architectures]
         MLIP architecture to use for calculations. Default is "mace_mp".
-    device : Devices
+    device : MaybeSequence[Devices]
         Device to run model on. Default is "cpu".
-    model_path : PathLike | None
+    model_path : MaybeSequence[PathLike] | None
         Path to MLIP model. Default is `None`.
-    calc_kwargs : dict[str, Any] | None
+    calc_kwargs : MaybeSequence[dict[str, Any]] | None
         Keyword arguments to pass to the selected calculator. Default is {}.
     set_calc : bool | None
         Whether to set (new) calculators for structures.  Default is True if
