@@ -65,7 +65,7 @@ def preprocess(
     args = []
     for key, value in options.items():
         if isinstance(value, bool):
-            if value is True:
+            if value:
                 args.append(f"--{key}")
         else:
             args.append(f"--{key}")
