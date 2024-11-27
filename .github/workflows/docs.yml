@@ -17,7 +17,7 @@ concurrency:
 
 jobs:
   docs-deploy:
-    if: github.ref == 'refs/heads/main' && github.repository == 'stfc/janus-core'
+    if: github.ref == 'refs/heads/main'
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
