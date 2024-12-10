@@ -29,3 +29,7 @@ def test_version():
     result = runner.invoke(app, ["--version"])
     assert result.exit_code == 0
     assert "janus-core version:" in strip_ansi_codes(result.stdout)
+
+    match 500:
+        case 5:
+            print("hi")
