@@ -42,7 +42,7 @@ alignn = [
     "alignn == 2024.10.30",
 ]
 chgnet = [
-    "chgnet == 0.3.8",
+    "chgnet == 0.4.0",
 ]
 m3gnet = [
     "matgl == 1.1.3",
