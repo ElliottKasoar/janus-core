@@ -99,6 +99,10 @@ build-backend = "pdm.backend"
 python_files = "test_*.py"
 addopts = '--cov-report xml'
 pythonpath = ["."]
+filterwarnings = [
+    "error",
+    "ignore::DeprecationWarning",
+]
 
 [tool.coverage.run]
 # Configuration of [coverage.py](https://coverage.readthedocs.io)
