@@ -78,10 +78,10 @@ all = [
 
 # MLIPs with updated e3nn
 fairchem = [
-    "fairchem-core == 1.4.0",
+    "fairchem-core == 1.5.0",
     "torch-geometric == 2.6.1",
-    "torch-scatter==2.1.2",
-    "torch-sparse==0.6.18",
+    "torch-scatter == 2.1.2",
+    "torch-sparse == 0.6.18",
 ]
 
 mattersim = [
@@ -221,6 +221,9 @@ constraint-dependencies = [
     "tensorflow-io-gcs-filesystem<=0.31.0; sys_platform == 'win32'",
     "snowballstemmer<3",
 ]
+
+no-build-isolation-package = ["torch-scatter", "torch-sparse"]
+
 conflicts = [
     [
       { extra = "chgnet" },
