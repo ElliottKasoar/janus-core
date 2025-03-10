@@ -5,8 +5,7 @@ on: [push, pull_request]
 jobs:
 
   tests:
-    runs-on: [self-hosted, macOS]
-    if: github.repository == 'stfc/janus-core'
+    runs-on: macos-latest
     timeout-minutes: 30
     strategy:
       matrix:
