@@ -38,7 +38,7 @@ jobs:
         run: uv sync --extra all
 
       - name: Build docs
-        run: cd docs && uv run make html
+        run: cd docs && uv run make all
 
       - name: upload
         uses: actions/upload-pages-artifact@v3
