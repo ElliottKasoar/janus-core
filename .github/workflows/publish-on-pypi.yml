@@ -6,19 +6,23 @@ on:
       # After vMajor.Minor.Patch _anything_ is allowed (without "/") !
       - v[0-9]+.[0-9]+.[0-9]+*
 
+# Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Allow one concurrent deployment
+concurrency:
+  group: "pages"
+
 jobs:
-  build-docs:
-    runs-on: ubuntu-latest
-    if:  startsWith(github.ref, 'refs/tags/v')
+  docs-deploy:
+    if: github.ref == 'refs/heads/main'
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
-    permissions:
-      contents: read
-      pages: write
-      id-token: write
-    concurrency:
-      group: "pages"
+    runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v4
@@ -35,10 +39,10 @@ jobs:
       - name: Install dependencies
         run: uv sync --extra all
 
-      - name: Build docs with tutorials
-        run: cd docs && uv run make all
+      - name: Build docs
+        run: cd docs && uv run make html
 
-      - name: Upload
+      - name: upload
         uses: actions/upload-pages-artifact@v3
         with:
           # Upload entire repository
@@ -47,19 +51,3 @@ jobs:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
-
-  publish:
-    needs: build-docs
-    runs-on: ubuntu-latest
-    if: github.repository == 'stfc/janus-core' && startsWith(github.ref, 'refs/tags/v')
-    environment:
-      name: release
-    permissions:
-      # For PyPI's trusted publishing.
-      id-token: write
-      # For release.
-      contents: write
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
