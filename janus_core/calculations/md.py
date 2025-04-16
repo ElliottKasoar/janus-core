@@ -68,8 +68,8 @@ class MolecularDynamics(BaseCalculation):
         MLIP architecture to use for simulation. Default is "mace_mp".
     device
         Device to run MLIP model on. Default is "cpu".
-    model_path
-        Path to MLIP model. Default is `None`.
+    model
+        Path to MLIP model or name of model. Default is `None`.
     read_kwargs
         Keyword arguments to pass to ase.io.read. By default,
         read_kwargs["index"] is -1.
@@ -182,7 +182,7 @@ class MolecularDynamics(BaseCalculation):
         struct: Atoms | PathLike,
         arch: Architectures = "mace_mp",
         device: Devices = "cpu",
-        model_path: PathLike | None = None,
+        model: PathLike | None = None,
         read_kwargs: ASEReadArgs | None = None,
         calc_kwargs: dict[str, Any] | None = None,
         set_calc: bool | None = None,
@@ -235,8 +235,8 @@ class MolecularDynamics(BaseCalculation):
             MLIP architecture to use for simulation. Default is "mace_mp".
         device
             Device to run MLIP model on. Default is "cpu".
-        model_path
-            Path to MLIP model. Default is `None`.
+        model
+            Path to MLIP model or name of model. Default is `None`.
         read_kwargs
             Keyword arguments to pass to ase.io.read. By default,
             read_kwargs["index"] is -1.
@@ -446,7 +446,7 @@ class MolecularDynamics(BaseCalculation):
             calc_name=__name__,
             arch=arch,
             device=device,
-            model_path=model_path,
+            model=model,
             read_kwargs=read_kwargs,
             sequence_allowed=False,
             calc_kwargs=calc_kwargs,
@@ -607,7 +607,7 @@ class MolecularDynamics(BaseCalculation):
                     sequence_allowed=False,
                     arch=self.arch,
                     device=self.device,
-                    model_path=self.model_path,
+                    model=self.model,
                     calc_kwargs=self.calc_kwargs,
                     set_calc=True,
                     logger=self.logger,
