@@ -60,7 +60,7 @@ python3 -m pip install janus-core[mace,chgnet,sevennet]
 
 > [!WARNING]
 > `fairchem-core` and `mattersim` both require a different version of `e3nn` to `mace-torch`,
-> so it is not currently possible to use MACE with MatterSim or eqV2 DeNS models.
+> so it is not currently possible to use MACE with MatterSim, eqV2 DeNS, or eSEN models.
 
 
 To install all MLIPs that do not depend on `dgl`:
