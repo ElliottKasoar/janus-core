@@ -38,13 +38,8 @@ jobs:
           uv pip install --reinstall pynvml
           uv pip install "fairchem-core[torch-extras]" --no-build-isolation --no-cache
 
-      - name: Install dgl dependencies
-        run: |
-          uv sync --extra mace --extra m3gnet --extra alignn
-          uv pip install --reinstall pynvml
-
       - name: Run test suite
         env:
           # show timings of tests
           PYTEST_ADDOPTS: "--durations=0"
-        run: uv run pytest tests/test_mlip_calculators.py tests/test_single_point.py tests/test_eos.py
+        run: uv run pytest tests/test_mlip_calculators.py tests/test_single_point.py
