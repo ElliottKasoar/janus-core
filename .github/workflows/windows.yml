@@ -30,6 +30,14 @@ jobs:
           PYTEST_ADDOPTS: "--durations=0"
         run: uv run pytest
 
+      - name: Install updated e3nn dependencies
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+        run: |
+          uv sync --extra fairchem
+          uv pip install --reinstall pynvml
+          uv pip install "fairchem-core[torch-extras]" --no-build-isolation --no-cache
+
       - name: Install dgl dependencies
         run: |
           uv sync --extra mace --extra m3gnet --extra alignn
