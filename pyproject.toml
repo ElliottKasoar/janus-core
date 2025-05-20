@@ -51,7 +51,7 @@ d3 = [
     "torch-dftd==0.5.1",
 ]
 grace = [
-    "tensorpotential == 0.5.1",
+    "tensorpotential == 0.5.1; python_version < '3.13'",
 ]
 mace = [
     "mace-torch==0.3.14",
@@ -82,7 +82,7 @@ all = [
 
 # MLIPs with updated e3nn
 fairchem = [
-    "fairchem-core == 1.10.0",
+    "fairchem-core == 1.10.0; python_version < '3.13'",
 ]
 mattersim = [
     "mattersim == 1.1.2; sys_platform != 'win32'",
@@ -99,14 +99,14 @@ uma = [
 
 # MLIPs with dgl dependency
 alignn = [
-    "alignn == 2024.5.27; sys_platform != 'win32'",
-    "torch == 2.2; sys_platform != 'win32'",
-    "torchdata == 0.7.1; sys_platform != 'win32'",
+    "alignn == 2024.5.27; sys_platform != 'win32' and python_version < '3.13'",
+    "torch == 2.2; sys_platform != 'win32' and python_version < '3.13'",
+    "torchdata == 0.7.1; sys_platform != 'win32' and python_version < '3.13'",
 ]
 m3gnet = [
-    "matgl == 1.1.3; sys_platform != 'win32'",
-    "torch == 2.2; sys_platform != 'win32'",
-    "torchdata == 0.7.1; sys_platform != 'win32'",
+    "matgl == 1.1.3; sys_platform != 'win32' and python_version < '3.13'",
+    "torch == 2.2; sys_platform != 'win32' and python_version < '3.13'",
+    "torchdata == 0.7.1; sys_platform != 'win32' and python_version < '3.13'",
 ]
 
 [project.scripts]
