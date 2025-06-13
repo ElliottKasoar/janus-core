@@ -61,7 +61,7 @@ orb = [
     "orb-models == 0.5.4; sys_platform != 'win32'",
 ]
 plumed = [
-    "plumed<3.0.0,>=2.9.0; sys_platform != 'win32'",
+    "plumed<3.0.0,>=2.9.0; sys_platform != 'win32' and python_version < '3.13'",
 ]
 sevennet = [
     "sevenn == 0.10.3",
