@@ -26,7 +26,7 @@ classifiers = [
 readme = "README.md"
 
 dependencies = [
-    "ase<4.0,>=3.25",
+    "ase<4.0,>=3.26",
     "click<9,>=8.2.1",
     "codecarbon<3.0.0,>=2.8.4",
     "numpy<3.0.0,>=1.26.4",
