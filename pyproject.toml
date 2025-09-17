@@ -59,7 +59,7 @@ mace = [
     "janus-core[d3]",
 ]
 orb = [
-    "orb-models == 0.5.5; sys_platform != 'win32'",
+    "orb-models == 0.5.5; sys_platform != 'win32' and python_version < '3.13'",
 ]
 pet-mad = [
     "pet-mad == 1.3.1; sys_platform != 'win32'"
