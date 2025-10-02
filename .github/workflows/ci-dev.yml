@@ -1,8 +1,6 @@
 name: ci-dev
 
-on:
-  push:
-    branches: [main]
+on: push
 
 jobs:
   test-dev-versions:
@@ -12,6 +10,7 @@ jobs:
     strategy:
       matrix:
         python-version: ["3.12"]
+        link: ["https://gitlab.com/ase/ase.git", "https://github.com/ACEsuit/mace.git"]
 
     steps:
     - uses: actions/checkout@v4
@@ -24,15 +23,9 @@ jobs:
     - name: Install dependencies
       run: uv sync --extra all
 
-    # Full reinstall in case the version number is the same as the last release
-    - name: Uninstall release versions
-      run: uv pip uninstall ase mace-torch
-
     - name: Install dev versions
       run: |
-        uv pip install \
-            https://gitlab.com/ase/ase.git \
-            https://github.com/ACEsuit/mace.git
+        uv pip install ${{ matrix.link }} -U
 
     - name: Run test suite
       env:
