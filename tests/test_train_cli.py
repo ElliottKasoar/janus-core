@@ -21,8 +21,6 @@ from tests.utils import (
     strip_ansi_codes,
 )
 
-from pytest import skip
-
 DATA_PATH = Path(__file__).parent / "data"
 MODEL_PATH = Path(__file__).parent / "models"
 EXTRA_MODEL_PATH = MODEL_PATH / "extra"
@@ -123,13 +121,13 @@ def write_tmp_config_nequip(
                 model_dict[f"{model_type}_path"] = str(MODEL_PATH / pth)
 
     if fine_tune:
-        model = Path(config["training_module"]["model"][model_type+"_path"]).name
+        model = Path(config["training_module"]["model"][model_type + "_path"]).name
         if (MODEL_PATH / model).exists():
-            config["training_module"]["model"][model_type+"_path"] = str(
+            config["training_module"]["model"][model_type + "_path"] = str(
                 MODEL_PATH / model
             )
         elif (MODEL_PATH / "extra" / model).exists():
-            config["training_module"]["model"][model_type+"_path"] = str(
+            config["training_module"]["model"][model_type + "_path"] = str(
                 MODEL_PATH / "extra" / model
             )
 
