@@ -492,7 +492,7 @@ def test_nequip_train_invalid_config_suffix(tmp_path):
 
 
 @pytest.mark.skipif(
-    not NEQUIP_EXTRA_MODEL_PATH.exists(), 
+    not NEQUIP_EXTRA_MODEL_PATH.exists(),
     reason=f"Extra model: {NEQUIP_EXTRA_MODEL_PATH} not downloaded.",
 )
 def test_nequip_fine_tune_foundation(tmp_path):
