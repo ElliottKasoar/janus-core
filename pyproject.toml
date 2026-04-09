@@ -224,10 +224,6 @@ conflicts = [
       { extra = "grace" },
     ],
     [
-      { extra = "mattersim" },
-      { extra = "grace" },
-    ],
-    [
       { extra = "fairchem" },
       { extra = "mace" },
     ],
