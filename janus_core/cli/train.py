@@ -142,21 +142,32 @@ def train(
                 )
 
         case "grace":
-            if "potential" not in config:
-                raise ValueError("No potential is specified in you config.")
+            if config.get("potential") is None:
+                raise ValueError("No potential is specified in your config.")
+
+            potential = config["potential"]
 
             if fine_tune:
-                model = config["potential"].get("finetune_foundation_model")
-                if model is None:
+                if potential.get("finetune_foundation_model") is None:
                     raise ValueError(
-                        """Fine-tuning was requested but your conifg
-                        does not contains a finetune_foundation_model"""
+                        """Fine-tuning was requested but your config does not
+                        contain a finetune_foundation_model."""
                     )
-            elif "finetune_foundation_model" in config["potential"]:
+
+                # gracemaker overwrites `filename` with the foundation model's
+                # own model.yaml, and ignores `preset` once loading from a file.
+                for key in ("filename", "preset"):
+                    if key in potential:
+                        raise ValueError(
+                            f"""Fine-tuning was requested, but `{key}` is also in
+                            your config. It would be silently ignored in favour
+                            of finetune_foundation_model."""
+                        )
+
+            elif "finetune_foundation_model" in potential:
                 raise ValueError(
                     """Fine-tuning not requested but finetune_foundation_model
-                    is in your config. Please use --fine-tune.
-                    """
+                    is in your config. Please use --fine-tune."""
                 )
 
         case _:

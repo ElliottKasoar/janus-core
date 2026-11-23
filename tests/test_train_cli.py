@@ -684,6 +684,60 @@ def test_sevennet_fine_tune_foundation(tmp_path):
             assert lines[0].split(",")[0] == "epoch"
 
 
+@pytest.mark.parametrize(
+    "fine_tune, mutate, match",
+    (
+        (False, lambda config: config.pop("potential"), "No potential is specified"),
+        (False, lambda config: config.update(potential=None), "No potential is"),
+        (
+            True,
+            lambda config: config["potential"].pop("finetune_foundation_model"),
+            "does not contain a finetune_foundation_model",
+        ),
+        (False, lambda config: None, "Please use --fine-tune"),
+        (
+            True,
+            lambda config: config["potential"].update(filename="model.yaml"),
+            "`filename` is also in your config",
+        ),
+        (
+            True,
+            lambda config: config["potential"].update(preset="FS"),
+            "`preset` is also in your config",
+        ),
+    ),
+    ids=(
+        "no-potential-section",
+        "empty-potential-section",
+        "fine-tune-without-foundation-model",
+        "foundation-model-without-fine-tune",
+        "fine-tune-with-filename",
+        "fine-tune-with-preset",
+    ),
+)
+def test_grace_invalid_config(tmp_path, fine_tune, mutate, match):
+    """Test grace configs are rejected before training starts."""
+    with open(DATA_PATH / "grace_fine_tune.yml", encoding="utf8") as file:
+        config = yaml.safe_load(file)
+
+    mutate(config)
+
+    config_path = tmp_path / "config.yml"
+    with open(config_path, "w", encoding="utf8") as file:
+        yaml.dump(config, file)
+
+    args = ["train", "grace", "--mlip-config", config_path]
+    if fine_tune:
+        args.append("--fine-tune")
+
+    result = runner.invoke(app, args)
+
+    assert result.exit_code == 1
+    assert isinstance(result.exception, ValueError)
+    # Messages are wrapped over several lines, so compare without whitespace.
+    assert match in " ".join(str(result.exception).split())
+
+
 def test_grace_train(tmp_path):
     """Test training with grace."""
     skip_extras("grace")
