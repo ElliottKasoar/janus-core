@@ -3,8 +3,9 @@
 from __future__ import annotations
 
 from argparse import ArgumentParser
+from logging import Logger
 from pathlib import Path
-from shutil import move, rmtree
+from shutil import copytree, move, rmtree
 from typing import Any
 
 import yaml
@@ -14,7 +15,7 @@ from janus_core.helpers.log import config_logger, config_tracker
 from janus_core.helpers.utils import none_to_dict, set_log_tracker
 
 
-def _move_grace_results(file_prefix: Path) -> None:
+def _move_grace_results(file_prefix: Path, logger: Logger | None = None) -> None:
     """
     Move gracemaker results into `file_prefix`.
 
@@ -25,6 +26,8 @@ def _move_grace_results(file_prefix: Path) -> None:
     ----------
     file_prefix
         Directory to move the `seed` directory into.
+    logger
+        Logger to warn through if results are merged. Default is None.
     """
     seed_dir = Path.cwd() / "seed"
     if not seed_dir.is_dir():
@@ -34,18 +37,18 @@ def _move_grace_results(file_prefix: Path) -> None:
     if target == seed_dir:
         return
 
-    target.mkdir(parents=True, exist_ok=True)
+    target.parent.mkdir(parents=True, exist_ok=True)
 
-    # Replace results for any seed that has been trained before.
-    for results in seed_dir.iterdir():
-        destination = target / results.name
-        if destination.is_dir():
-            rmtree(destination)
-        elif destination.exists():
-            destination.unlink()
-        move(results, destination)
+    if not target.exists():
+        move(seed_dir, target)
+        return
 
-    seed_dir.rmdir()
+    # Merge into previous results, overwriting individual files, as gracemaker
+    # would if it were writing into the existing directory itself.
+    if logger:
+        logger.warning("Merging results into existing directory: %s", target)
+    copytree(seed_dir, target, dirs_exist_ok=True)
+    rmtree(seed_dir)
 
 
 def train(
@@ -177,7 +180,7 @@ def train(
     finally:
         # Relocate results even if training failed, to avoid leaving them in cwd.
         if arch == "grace":
-            _move_grace_results(Path(file_prefix))
+            _move_grace_results(Path(file_prefix), logger)
 
     if logger:
         logger.info("Training complete")
