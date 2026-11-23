@@ -173,13 +173,6 @@ def write_tmp_data_sevennet(
                 MODEL_PATH / "extra" / model
             )
 
-    if fine_tune:
-        model = Path(config["train"]["continue"]["checkpoint"]).name
-        if (MODEL_PATH / "extra" / model).exists():
-            config["train"]["continue"]["checkpoint"] = str(
-                MODEL_PATH / "extra" / model
-            )
-
     # Write out temporary config with corrected paths
     tmp_config = tmp_path / "config.yml"
     with open(tmp_config, "w", encoding="utf8") as file:
