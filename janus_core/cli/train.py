@@ -164,7 +164,7 @@ def train(
                             of finetune_foundation_model."""
                         )
 
-            elif "finetune_foundation_model" in potential:
+            elif potential.get("finetune_foundation_model") is not None:
                 raise ValueError(
                     """Fine-tuning not requested but finetune_foundation_model
                     is in your config. Please use --fine-tune."""

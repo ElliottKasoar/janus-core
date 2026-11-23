@@ -26,6 +26,10 @@ EXTRA_MODEL_PATH = MODEL_PATH / "extra"
 NEQUIP_EXTRA_MODEL_PATH = EXTRA_MODEL_PATH / "NequIP-MP-L-0.1.nequip.zip"
 SEVENNET_EXTRA_MODEL_PATH = EXTRA_MODEL_PATH / "SevenNet_l3i5.pth"
 
+# Gracemaker downloads foundation models into its own cache, rather than a path
+# we can pass, so it cannot be fetched by tests/models/extra_models.py.
+GRACE_FOUNDATION_MODEL = "GRACE-1L-OAM"
+
 runner = CliRunner()
 
 
@@ -694,6 +698,11 @@ def test_sevennet_fine_tune_foundation(tmp_path):
             lambda config: config["potential"].pop("finetune_foundation_model"),
             "does not contain a finetune_foundation_model",
         ),
+        (
+            True,
+            lambda config: config["potential"].update(finetune_foundation_model=None),
+            "does not contain a finetune_foundation_model",
+        ),
         (False, lambda config: None, "Please use --fine-tune"),
         (
             True,
@@ -710,6 +719,7 @@ def test_sevennet_fine_tune_foundation(tmp_path):
         "no-potential-section",
         "empty-potential-section",
         "fine-tune-without-foundation-model",
+        "fine-tune-with-null-foundation-model",
         "foundation-model-without-fine-tune",
         "fine-tune-with-filename",
         "fine-tune-with-preset",
@@ -789,6 +799,15 @@ def test_grace_fine_tune_foundation(tmp_path):
     """Test fine tuning grace."""
     skip_extras("grace")
 
+    # Imported here, as tensorpotential is an optional dependency.
+    from tensorpotential.calculator.foundation_models import (
+        FOUNDATION_CHECKPOINTS_CACHE_DIR,
+    )
+
+    checkpoint = Path(FOUNDATION_CHECKPOINTS_CACHE_DIR) / GRACE_FOUNDATION_MODEL
+    if not checkpoint.is_dir():
+        pytest.skip(f"Foundation model: {checkpoint} not downloaded.")
+
     with chdir(tmp_path):
         log_path = tmp_path / "test.log"
         summary_path = tmp_path / "summary.yml"
@@ -822,7 +841,9 @@ def test_grace_fine_tune_foundation(tmp_path):
         assert grace_dir.is_dir()
         assert metrics_path.exists()
 
-        assert_log_contains(log_path, includes=["Fine tuning model: GRACE-1L-OAM"])
+        assert_log_contains(
+            log_path, includes=[f"Fine tuning model: {GRACE_FOUNDATION_MODEL}"]
+        )
 
         with open(metrics_path, encoding="utf8") as file:
             metrics = yaml.safe_load(file)
