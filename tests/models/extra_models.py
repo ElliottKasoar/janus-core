@@ -48,8 +48,3 @@ if __name__ == "__main__":
         "https://huggingface.co/deepmodelingcommunity/DPA-3.3-1M/resolve/main/DPA-3.3-1M.pt?download=true",
         args.path / "DPA-3.3-1M.pt",
     )
-
-    urlretrieve(
-        "https://github.com/MDIL-SNU/SevenNet/raw/dff008ac9c53d368b5bee30a27fa4bdfd73f19b2/sevenn/pretrained_potentials/SevenNet_l3i5/checkpoint_l3i5.pth",
-        filename=args.path / "SevenNet_l3i5.pth",
-    )
