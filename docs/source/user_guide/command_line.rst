@@ -685,7 +685,7 @@ Training and fine-tuning MLIPs
 ------------------------------
 
 .. note::
-    Currently MACE, Nequip, and SevenNet models are supported.
+    Currently MACE, Nequip, SevenNet, and GRACE models are supported.
 
 Models can be trained by passing an archictecture and an archictecture specific configuration file as options to the ``janus train`` command. The configuration file will be passed to the corresponding MLIPs command line interface. For example to train a MACE MLIP:
 
@@ -730,6 +730,31 @@ Training SevenNet MLIPs
 +++++++++++++++++++++++
 
 The `SevenNet documentation <https://sevennet.readthedocs.io/en/latest/>`_ contains information on training SevenNet MLIPs. The SevenNet `tutorial repository <https://github.com/MDIL-SNU/sevennet_tutorial/tree/main>`_ also contains some example ```.yaml``` configuration files for training and fine-tuning.
+
+
+Training GRACE MLIPs
+++++++++++++++++++++
+
+Configuration of GRACE training is described in the `GRACE documentation <https://gracemaker.readthedocs.io/en/latest/gracemaker/inputfile/>`_, which is passed to ``gracemaker``.
+
+Fine-tuning is requested through the configuration file rather than by model path, by setting ``finetune_foundation_model`` in the ``potential`` section, alongside the ``--fine-tune`` option:
+
+.. code-block:: yaml
+
+    potential:
+      finetune_foundation_model: "GRACE-1L-OAM"
+
+.. code-block:: bash
+
+    janus train grace --mlip-config /path/to/grace/fine/tuning/config.yml --fine-tune
+
+Training data is set by ``filename`` in the ``data`` section, and may be either an ``extxyz`` file or a pickled pandas DataFrame. Energies and forces are read through ASE, so ``extxyz`` files must use the standard ``energy`` and ``forces`` labels.
+
+``gracemaker`` writes its output to a ``seed/<seed>`` directory, which janus-core moves into ``./janus_results``. This contains checkpoints and the ``train_metrics.yaml`` metrics file.
+
+.. note::
+    GRACE is comparatively slow and memory hungry to train, so a single fine-tuning epoch may take on the order of a minute and require several GB of memory.
+
 
 Preprocessing training data
 ----------------------------

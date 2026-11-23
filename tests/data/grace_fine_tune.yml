@@ -2,7 +2,7 @@ seed: 42
 cutoff: 6
 
 data:
-  filename: "tests/data/mlip_train.pkl.gz"
+  filename: "tests/data/mlip_train.xyz"
   reference_energy: 0
 
 potential:

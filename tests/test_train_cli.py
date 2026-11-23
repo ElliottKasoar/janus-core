@@ -181,9 +181,9 @@ def write_tmp_data_sevennet(
     return tmp_config
 
 
-def write_tmp_config_grace(config_path: Path, tmp_path: Path) -> Path:
+def write_tmp_data_grace(config_path: Path, tmp_path: Path) -> Path:
     """
-    Fix paths in config files and write corrected config to tmp_path for grace.
+    Fix paths and data columns, write config and data to tmp_path.
 
     Parameters
     ----------
@@ -202,9 +202,18 @@ def write_tmp_config_grace(config_path: Path, tmp_path: Path) -> Path:
         config = yaml.safe_load(file)
 
     # Use DATA_PATH to set paths relative to this test file
-    for file in config["data"].keys() & {"filename", "test_filename"}:
-        if (DATA_PATH / Path(config["data"][file]).name).exists():
-            config["data"][file] = str(DATA_PATH / Path(config["data"][file]).name)
+    for dataset in config["data"].keys() & {"filename", "test_filename"}:
+        name = Path(config["data"][dataset]).name
+        path = DATA_PATH / name
+        if path.exists():
+            frames = read(path, index=":")
+            # gracemaker reads energy and forces via ASE's calculator.
+            rename_info = {"dft_energy": "energy", "dft_stress": "stress"}
+            rename_arrays = {"dft_forces": "forces"}
+            for frame in frames:
+                rename_atoms_attributes(frame, rename_info, rename_arrays)
+            write(tmp_path / name, frames)
+            config["data"][dataset] = str(tmp_path / name)
 
     # Write out temporary config with corrected paths
     tmp_config = tmp_path / "config.yml"
@@ -689,7 +698,7 @@ def test_grace_fine_tune_foundation(tmp_path):
         metrics_path = grace_dir / "train_metrics.yaml"
 
         config_path = DATA_PATH / "grace_fine_tune.yml"
-        config_path = write_tmp_config_grace(config_path, tmp_path)
+        config_path = write_tmp_data_grace(config_path, tmp_path)
         result = runner.invoke(
             app,
             [
