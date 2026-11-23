@@ -1,0 +1,40 @@
+seed: 42
+cutoff: 6
+
+data:
+  filename: "tests/data/mlip_train.xyz"
+  reference_energy: 0
+  test_size: 0.2
+
+potential:
+  preset: FS
+  # Deliberately tiny, to keep training in tests cheap.
+  kwargs: {lmax: [2, 2], n_rad_max: [4, 4], n_rad_base: 8, embedding_size: 8, max_order: 2, fs_parameters: [[1.0, 1.0], [1.0, 0.5]]}
+  scale: False
+  shift: False
+
+fit:
+  loss:
+    energy:
+      type: huber
+      weight: 1.
+      delta: 0.01
+    forces:
+      type: huber
+      weight: 5.
+      delta: 0.01
+
+  maxiter: 1 # Max number of optimization epochs
+  optimizer: Adam
+  opt_params: { learning_rate: 0.01 }
+  scheduler: cosine_decay # scheduler for learning-rate reduction during training
+  scheduler_params: {"minimum_learning_rate": 0.0001}
+
+  batch_size: 8
+  test_batch_size: 8
+
+  jit_compile: False  # XLA compilation is not worth the overhead for one epoch
+  train_max_n_buckets: 1
+  test_max_n_buckets: 1
+
+  checkpoint_freq: 10 # frequency for **REGULAR** checkpoints.

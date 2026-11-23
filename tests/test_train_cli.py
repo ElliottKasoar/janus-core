@@ -684,6 +684,53 @@ def test_sevennet_fine_tune_foundation(tmp_path):
             assert lines[0].split(",")[0] == "epoch"
 
 
+def test_grace_train(tmp_path):
+    """Test training with grace."""
+    skip_extras("grace")
+
+    with chdir(tmp_path):
+        log_path = tmp_path / "test.log"
+        summary_path = tmp_path / "summary.yml"
+
+        results_dir = Path("janus_results")
+        grace_dir = results_dir / "seed" / "42"
+
+        metrics_path = grace_dir / "train_metrics.yaml"
+        model_path = grace_dir / "final_model"
+        checkpoints_path = grace_dir / "checkpoints"
+
+        config_path = DATA_PATH / "grace_train.yml"
+        config_path = write_tmp_data_grace(config_path, tmp_path)
+        result = runner.invoke(
+            app,
+            [
+                "train",
+                "grace",
+                "--mlip-config",
+                config_path,
+                "--log",
+                log_path,
+                "--summary",
+                summary_path,
+            ],
+        )
+        assert result.exit_code == 0
+
+        assert results_dir.exists()
+        assert log_path.exists()
+        assert summary_path.exists()
+        assert grace_dir.is_dir()
+        assert metrics_path.exists()
+        assert model_path.is_dir()
+        assert checkpoints_path.is_dir()
+
+        with open(metrics_path, encoding="utf8") as file:
+            metrics = yaml.safe_load(file)
+            assert len(metrics) == 1
+            for epoch in metrics:
+                assert "total_loss/train" in epoch
+
+
 def test_grace_fine_tune_foundation(tmp_path):
     """Test fine tuning grace."""
     skip_extras("grace")
