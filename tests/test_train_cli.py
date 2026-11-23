@@ -26,8 +26,7 @@ EXTRA_MODEL_PATH = MODEL_PATH / "extra"
 NEQUIP_EXTRA_MODEL_PATH = EXTRA_MODEL_PATH / "NequIP-MP-L-0.1.nequip.zip"
 SEVENNET_EXTRA_MODEL_PATH = EXTRA_MODEL_PATH / "SevenNet_l3i5.pth"
 
-# Gracemaker downloads foundation models into its own cache, rather than a path
-# we can pass, so it cannot be fetched by tests/models/extra_models.py.
+# Cached by gracemaker itself, so extra_models.py cannot fetch it.
 GRACE_FOUNDATION_MODEL = "GRACE-1L-OAM"
 
 runner = CliRunner()

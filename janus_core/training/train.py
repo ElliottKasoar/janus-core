@@ -43,8 +43,7 @@ def _move_grace_results(file_prefix: Path, logger: Logger | None = None) -> None
         move(seed_dir, target)
         return
 
-    # Merge into previous results, overwriting individual files, as gracemaker
-    # would if it were writing into the existing directory itself.
+    # Merge as gracemaker would, overwriting individual files.
     if logger:
         logger.warning("Merging results into existing directory: %s", target)
     copytree(seed_dir, target, dirs_exist_ok=True)

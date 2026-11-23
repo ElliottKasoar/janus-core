@@ -154,8 +154,7 @@ def train(
                         contain a finetune_foundation_model."""
                     )
 
-                # gracemaker overwrites `filename` with the foundation model's
-                # own model.yaml, and ignores `preset` once loading from a file.
+                # gracemaker overwrites `filename` and ignores `preset`.
                 for key in ("filename", "preset"):
                     if key in potential:
                         raise ValueError(

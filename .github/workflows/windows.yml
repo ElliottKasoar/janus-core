@@ -32,6 +32,13 @@ jobs:
         run: |
           python3 tests/models/extra_models.py tests/models/extra
 
+      # Gracemaker caches this itself, so extra_models.py cannot fetch it.
+      - name: Download GRACE foundation model
+        shell: bash
+        continue-on-error: true
+        run: |
+          uv run --no-sync python -c "from tensorpotential.calculator.foundation_models import get_or_download_checkpoint; get_or_download_checkpoint('GRACE-1L-OAM')"
+
       - name: Run test suite
         env:
           # show timings of tests
