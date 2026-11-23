@@ -822,6 +822,8 @@ def test_grace_fine_tune_foundation(tmp_path):
         assert grace_dir.is_dir()
         assert metrics_path.exists()
 
+        assert_log_contains(log_path, includes=["Fine tuning model: GRACE-1L-OAM"])
+
         with open(metrics_path, encoding="utf8") as file:
             metrics = yaml.safe_load(file)
             assert len(metrics) == 1

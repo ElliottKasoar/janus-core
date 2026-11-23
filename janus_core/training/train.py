@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from argparse import ArgumentParser
 from pathlib import Path
+from shutil import move, rmtree
 from typing import Any
 
 import yaml
@@ -11,6 +12,40 @@ import yaml
 from janus_core.helpers.janus_types import Architectures, PathLike
 from janus_core.helpers.log import config_logger, config_tracker
 from janus_core.helpers.utils import none_to_dict, set_log_tracker
+
+
+def _move_grace_results(file_prefix: Path) -> None:
+    """
+    Move gracemaker results into `file_prefix`.
+
+    Gracemaker always writes to a `seed/<seed>` directory relative to the current
+    working directory, with no option to configure it.
+
+    Parameters
+    ----------
+    file_prefix
+        Directory to move the `seed` directory into.
+    """
+    seed_dir = Path.cwd() / "seed"
+    if not seed_dir.is_dir():
+        return
+
+    target = file_prefix.resolve() / "seed"
+    if target == seed_dir:
+        return
+
+    target.mkdir(parents=True, exist_ok=True)
+
+    # Replace results for any seed that has been trained before.
+    for results in seed_dir.iterdir():
+        destination = target / results.name
+        if destination.is_dir():
+            rmtree(destination)
+        elif destination.exists():
+            destination.unlink()
+        move(results, destination)
+
+    seed_dir.rmdir()
 
 
 def train(
@@ -109,6 +144,9 @@ def train(
 
             mlip_args = [str(mlip_config)]
 
+            potential = options.get("potential") or {}
+            foundation_model = potential.get("finetune_foundation_model")
+
         case _:
             raise ValueError(f"{arch} is currently unsupported in train.")
 
@@ -134,12 +172,12 @@ def train(
     if tracker:
         tracker.start_task("Training")
 
-    run(mlip_args)
-
-    if arch == "grace" and (Path.cwd() / "seed").exists():
-        # Gracemaker always works in ./seed.
-        file_prefix.mkdir(parents=True, exist_ok=True)
-        (Path.cwd() / "seed").rename(file_prefix.resolve() / "seed")
+    try:
+        run(mlip_args)
+    finally:
+        # Relocate results even if training failed, to avoid leaving them in cwd.
+        if arch == "grace":
+            _move_grace_results(Path(file_prefix))
 
     if logger:
         logger.info("Training complete")
