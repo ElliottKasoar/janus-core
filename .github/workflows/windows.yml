@@ -1,3 +1,7 @@
+# TEMPORARY: trimmed to debug the vesin/DeePMD-kit import failure on Windows.
+# All test runs except the DeePMD-kit one are disabled; the uv syncs are kept so
+# the final environment resolves exactly as it does on a normal run.
+# Revert this file before merging.
 name: windows-ci
 
 on: [push, pull_request]
@@ -32,11 +36,12 @@ jobs:
         run: |
           python3 tests/models/extra_models.py tests/models/extra
 
-      - name: Run test suite
-        env:
-          # show timings of tests
-          PYTEST_ADDOPTS: "--durations=0"
-        run: uv run --no-sync pytest
+      # TEMPORARY: disabled while debugging vesin
+      # - name: Run test suite
+      #   env:
+      #     # show timings of tests
+      #     PYTEST_ADDOPTS: "--durations=0"
+      #   run: uv run --no-sync pytest
 
       - name: Install updated e3nn dependencies
         run: |
@@ -44,18 +49,36 @@ jobs:
           uv pip install --reinstall pynvml
           uv pip install "fairchem-core[torch-extras]" --no-build-isolation
 
-      - name: Run test suite for updated e3nn dependencies
-        env:
-          # show timings of tests
-          PYTEST_ADDOPTS: "--durations=0"
-          HF_TOKEN: ${{ secrets.HF_TOKEN }}
-        run: uv run --no-sync pytest tests/test_mlip_calculators.py tests/test_single_point.py
+      # TEMPORARY: disabled while debugging vesin
+      # - name: Run test suite for updated e3nn dependencies
+      #   env:
+      #     # show timings of tests
+      #     PYTEST_ADDOPTS: "--durations=0"
+      #     HF_TOKEN: ${{ secrets.HF_TOKEN }}
+      #   run: uv run --no-sync pytest tests/test_mlip_calculators.py tests/test_single_point.py
 
       - name: Install DeePMD-kit (incompatible with MACE and fairchem)
         run: uv sync --extra deepmd
+
+      # TEMPORARY: surfaces the ImportError that deepmd's is_vesin_torch_available swallows
+      - name: Diagnose vesin import
+        continue-on-error: true
+        shell: bash
+        run: |
+          uv pip list | grep -Ei "vesin|^torch "
+          uv run --no-sync python - <<'PY'
+          import importlib, traceback
+          for name in ("torch", "vesin", "vesin_torch", "vesin.torch"):
+              try:
+                  mod = importlib.import_module(name)
+                  print(f"OK    {name} {getattr(mod, '__version__', '')}", flush=True)
+              except Exception:
+                  print(f"FAIL  {name}", flush=True)
+                  traceback.print_exc()
+          PY
 
       - name: Run test suite for DeePMD-kit
         env:
           # show timings of tests
           PYTEST_ADDOPTS: "--durations=0"
-        run: uv run --no-sync pytest tests/test_mlip_calculators.py tests/test_single_point.py
+        run: uv run --no-sync pytest tests/test_single_point.py -k deepmd
